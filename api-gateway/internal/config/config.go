@@ -8,11 +8,17 @@ import (
 )
 
 type APIConfig struct{
-	Env string `yaml:"env"`
-	HTTPServer `yaml:"http_server"`
+	Env string 			`yaml:"env"`
+	HTTPServer 			`yaml:"http_server"`
+	GRPCStorageService 	`yaml:"grpc_storage_service"`
 }
 
 type HTTPServer struct{
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+}
+
+type GRPCStorageService struct{
 	Host string `yaml:"host"`
 	Port string `yaml:"port"`
 }
