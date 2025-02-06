@@ -11,8 +11,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+var (
+	storageServiceClient storagepb.StorageServiceClient
+)
+
 func CreateStorage(w http.ResponseWriter, r *http.Request){
-	
+
 }
 
 func CreateCell(w http.ResponseWriter, r *http.Request){
@@ -35,10 +39,10 @@ func main(){
 	}
 
 	defer storageServiceConn.Close()
-	storageServiceClient := storagepb.NewStorageServiceClient(storageServiceConn)
+	storageServiceClient = storagepb.NewStorageServiceClient(storageServiceConn)
 
-	http.HandleFunc("/api/v1/storages", )
-	http.HandleFunc("/api/v1/cells", nil)
-	http.HandleFunc("/api/v1/boxes". )
+	http.HandleFunc("/api/v1/storages", CreateStorage)
+	http.HandleFunc("/api/v1/cells", CreateCell)
+	http.HandleFunc("/api/v1/boxes", CreateBox)
 
 }
