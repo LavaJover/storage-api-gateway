@@ -15,9 +15,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/boxes": {
+            "post": {
+                "description": "Create new named box connected to cell",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "boxes"
+                ],
+                "summary": "Create new box",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.createBoxOkResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": "Method is not supported",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Storage service failed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/cells": {
             "post": {
-                "description": "Create new named cell to store boxes",
+                "description": "Create new named cell connected to storage to store boxes",
                 "consumes": [
                     "application/json"
                 ],
@@ -99,6 +140,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.createBoxOkResponse": {
+            "type": "object",
+            "properties": {
+                "cell_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "main.createCellOkResponse": {
             "type": "object",
             "properties": {

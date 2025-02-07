@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  main.createBoxOkResponse:
+    properties:
+      cell_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   main.createCellOkResponse:
     properties:
       id:
@@ -22,11 +31,38 @@ info:
   title: storage-master API
   version: "1.0"
 paths:
+  /api/v1/boxes:
+    post:
+      consumes:
+      - application/json
+      description: Create new named box connected to cell
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.createBoxOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "500":
+          description: Storage service failed
+          schema:
+            type: string
+      summary: Create new box
+      tags:
+      - boxes
   /api/v1/cells:
     post:
       consumes:
       - application/json
-      description: Create new named cell to store boxes
+      description: Create new named cell connected to storage to store boxes
       produces:
       - application/json
       responses:
