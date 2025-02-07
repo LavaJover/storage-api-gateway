@@ -204,10 +204,31 @@ func main() {
 	defer storageServiceConn.Close()
 	storageServiceClient = storagepb.NewStorageServiceClient(storageServiceConn)
 
-	http.HandleFunc("/api/v1/storages", CreateStorageHandler)
-	http.HandleFunc("/api/v1/cells", CreateCellHandler)
-	http.HandleFunc("/api/v1/boxes", CreateBoxHandler)
-	http.HandleFunc("/api/v1/swagger/", httpSwagger.WrapHandler)
+	// Handle endpoints
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/api/v1/storages", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			CreateStorageHandler(w, r)
+		}
+	})
+
+	mux.HandleFunc("/api/v1/cells", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			CreateCellHandler(w, r)
+		}
+	})
+
+	mux.HandleFunc("/api/v1/boxes", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			CreateBoxHandler(w, r)
+		}
+	})
+
+	mux.HandleFunc("/api/v1/swagger/", httpSwagger.WrapHandler)
 
 	if err := http.ListenAndServe(cfg.HTTPServer.Host+":"+cfg.HTTPServer.Port, nil); err != nil {
 		log.Fatalf("failed to start HTTP server")
