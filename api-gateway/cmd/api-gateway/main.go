@@ -200,6 +200,7 @@ func GetCellsHandler(w http.ResponseWriter, r *http.Request){
 		StorageId: storageID,
 	}
 
+	// Process response from storage service
 	response, err := storageServiceClient.GetCells(context.Background(), &getCellsRequest)
 	if err != nil{
 		http.Error(w, "Error from storage service", http.StatusInternalServerError)
@@ -249,6 +250,61 @@ func CreateBoxHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// Endpoint to get boxes by cell_id
+type getBoxesOkResponse struct{
+	Boxes []struct{
+		ID uint64 `json:"id"`
+		Name string `json:"name"`
+		CellID uint64 `json:"cell_id"`
+	}
+}
+
+// @Summary Get boxes by cell_id
+// @Description Get all boxes related to given cell_id checking user permissions
+// @Tags boxes
+// @Accept json
+// @Produce json
+// @Param cell_id query uint true "Cell ID"
+// @Success 201 {object} getBoxesOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 403 {string} string "You don't have enough permissions"
+// @Failure 405 {string} string "Method is not supported"
+// @Failure 500 {string} string "Storage service failed"
+// @Router /boxes [get]
+func GetBoxesHandler(w http.ResponseWriter, r *http.Request){
+
+	// Extract JWT
+	// Process JWT and check permissions
+	
+	// Extract cell_id from query param
+	cellIDStr := r.URL.Query().Get("cell_id")
+	if cellIDStr == ""{
+		http.Error(w, "Query param cell_id was not found", http.StatusBadRequest)
+		return
+	}
+
+	cellID, err := strconv.ParseUint(cellIDStr, 10, 64)
+	if err != nil{
+		http.Error(w, "Incorrect query param cell_id", http.StatusBadRequest)
+		return
+	}
+
+	// Create request to storage service
+	getBoxesRequest := storagepb.GetBoxesRequest{
+		CellId: cellID,
+	}
+
+	// Process response from storage service
+	response, err := storageServiceClient.GetBoxes(context.Background(), &getBoxesRequest)
+	if err != nil{
+		http.Error(w, "Error from storage service", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
 func main() {
 
 	cfg := config.MustLoad()
@@ -292,6 +348,8 @@ func main() {
 		switch r.Method{
 		case http.MethodPost:
 			CreateBoxHandler(w, r)
+		case http.MethodGet:
+			GetBoxesHandler(w, r)
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}

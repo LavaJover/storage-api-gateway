@@ -25,6 +25,20 @@ definitions:
       name:
         type: string
     type: object
+  main.getBoxesOkResponse:
+    properties:
+      boxes:
+        items:
+          properties:
+            cell_id:
+              type: integer
+            id:
+              type: integer
+            name:
+              type: string
+          type: object
+        type: array
+    type: object
   main.getCellsOkResponse:
     properties:
       cells:
@@ -60,6 +74,42 @@ info:
   version: "1.0"
 paths:
   /boxes:
+    get:
+      consumes:
+      - application/json
+      description: Get all boxes related to given cell_id checking user permissions
+      parameters:
+      - description: Cell ID
+        in: query
+        name: cell_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.getBoxesOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "403":
+          description: You don't have enough permissions
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "500":
+          description: Storage service failed
+          schema:
+            type: string
+      summary: Get boxes by cell_id
+      tags:
+      - boxes
     post:
       consumes:
       - application/json

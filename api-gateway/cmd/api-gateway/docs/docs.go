@@ -16,6 +16,60 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/boxes": {
+            "get": {
+                "description": "Get all boxes related to given cell_id checking user permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "boxes"
+                ],
+                "summary": "Get boxes by cell_id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Cell ID",
+                        "name": "cell_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.getBoxesOkResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "You don't have enough permissions",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": "Method is not supported",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Storage service failed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new named box connected to cell",
                 "consumes": [
@@ -275,6 +329,28 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "main.getBoxesOkResponse": {
+            "type": "object",
+            "properties": {
+                "boxes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "cell_id": {
+                                "type": "integer"
+                            },
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         },
