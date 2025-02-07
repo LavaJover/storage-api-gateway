@@ -25,6 +25,20 @@ definitions:
       name:
         type: string
     type: object
+  main.getCellsOkResponse:
+    properties:
+      cells:
+        items:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            storage_id:
+              type: integer
+          type: object
+        type: array
+    type: object
   main.getStoragesOkResponse:
     properties:
       storages:
@@ -73,6 +87,42 @@ paths:
       tags:
       - boxes
   /cells:
+    get:
+      consumes:
+      - application/json
+      description: Get all cells by given storage_id with permission checking
+      parameters:
+      - description: Storage ID
+        in: query
+        name: storage_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.getCellsOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "403":
+          description: You don't have enough permissions
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "500":
+          description: Storage service failed
+          schema:
+            type: string
+      summary: Get cells by storage_id
+      tags:
+      - cells
     post:
       consumes:
       - application/json
@@ -113,6 +163,10 @@ paths:
             $ref: '#/definitions/main.getStoragesOkResponse'
         "400":
           description: Bad request
+          schema:
+            type: string
+        "403":
+          description: You dont't have enough permissions
           schema:
             type: string
         "405":

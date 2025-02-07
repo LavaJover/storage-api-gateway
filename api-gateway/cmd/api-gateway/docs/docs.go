@@ -57,6 +57,60 @@ const docTemplate = `{
             }
         },
         "/cells": {
+            "get": {
+                "description": "Get all cells by given storage_id with permission checking",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cells"
+                ],
+                "summary": "Get cells by storage_id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Storage ID",
+                        "name": "storage_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.getCellsOkResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "You don't have enough permissions",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": "Method is not supported",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Storage service failed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new named cell connected to storage to store boxes",
                 "consumes": [
@@ -119,6 +173,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "You dont't have enough permissions",
                         "schema": {
                             "type": "string"
                         }
@@ -215,6 +275,28 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "main.getCellsOkResponse": {
+            "type": "object",
+            "properties": {
+                "cells": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "storage_id": {
+                                "type": "integer"
+                            }
+                        }
+                    }
                 }
             }
         },

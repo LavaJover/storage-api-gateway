@@ -7,9 +7,11 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/LavaJover/storage-api-gateway/internal/config"
 	"github.com/LavaJover/storage-api-gateway/pkg/middleware"
+
 	// models "github.com/LavaJover/storage-master/storage-service/pkg/models"
 	storagepb "github.com/LavaJover/storage-master/storage-service/proto/gen"
 	"google.golang.org/grpc"
@@ -51,6 +53,7 @@ func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newStorage)
 	if err != nil {
 		http.Error(w, "Failed to parse JSON: "+err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	// Process response from storage-service
@@ -58,6 +61,7 @@ func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Error from storage service", http.StatusInternalServerError)
+		return
 	}
 
 	// Process HTTP response
@@ -82,12 +86,15 @@ type getStoragesOkResponse struct{
 // @Produce json
 // @Success 201 {object} getStoragesOkResponse
 // @Failure 400 {string} string "Bad request"
+// @Failure 403 {string} string "You dont't have enough permissions"
 // @Failure 405 {string} string "Method is not supported"
 // @Failure 500 {string} string "Storage service failed"
 // @Router /storages [get]
 func GetStoragesHandler(w http.ResponseWriter, r *http.Request){
 
 	// Extract user_id from JWT
+	// ...
+	// Check if user have enough permissions to request this
 	userID := 2
 
 	// Create request to storage service
@@ -100,6 +107,7 @@ func GetStoragesHandler(w http.ResponseWriter, r *http.Request){
 
 	if err != nil{
 		http.Error(w, "Error from storage service", http.StatusInternalServerError)
+		return
 	}
 
 	// Process HTTP response
@@ -131,6 +139,7 @@ func CreateCellHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newCell)
 	if err != nil {
 		http.Error(w, "Failed to parse JSON: "+err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	// Process response from storage-service
@@ -138,11 +147,68 @@ func CreateCellHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Error from storage service", http.StatusInternalServerError)
+		return
 	}
 
 	// Process HTTP response
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
+}
+
+// Endpoint to get cells by storage_id
+type getCellsOkResponse struct{
+	Cells []struct{
+		ID uint64 `json:"id"`
+		Name string `json:"name"`
+		StorageID uint64 `json:"storage_id"`
+	}
+}
+
+// @Summary Get cells by storage_id
+// @Description Get all cells by given storage_id with permission checking
+// @Tags cells
+// @Accept json
+// @Produce json
+// @Param storage_id query uint true "Storage ID"
+// @Success 201 {object} getCellsOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 403 {string} string "You don't have enough permissions"
+// @Failure 405 {string} string "Method is not supported"
+// @Failure 500 {string} string "Storage service failed"
+// @Router /cells [get]
+func GetCellsHandler(w http.ResponseWriter, r *http.Request){
+
+	// Extract JWT and user_id
+	// ....
+	// Check if user has enough permissions to do this request
+
+	// Extract storage_id from query
+	storageIDStr := r.URL.Query().Get("storage_id")
+	if storageIDStr == ""{
+		http.Error(w, "Query param storage_id was not found", http.StatusBadRequest)
+		return
+	}
+
+	storageID, err := strconv.ParseUint(storageIDStr, 10, 64)
+	if err != nil{
+		http.Error(w, "Incorrect param storage_id", http.StatusBadRequest)
+		return
+	}
+
+	// Creating request to storage service
+	getCellsRequest := storagepb.GetCellsRequest{
+		StorageId: storageID,
+	}
+
+	response, err := storageServiceClient.GetCells(context.Background(), &getCellsRequest)
+	if err != nil{
+		http.Error(w, "Error from storage service", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+
 }
 
 // Endpoint to create new box
@@ -215,6 +281,8 @@ func main() {
 		switch r.Method{
 		case http.MethodPost:
 			CreateCellHandler(w, r)
+		case http.MethodGet:
+			GetCellsHandler(w, r)
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
