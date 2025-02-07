@@ -25,13 +25,27 @@ definitions:
       name:
         type: string
     type: object
+  main.getStoragesOkResponse:
+    properties:
+      storages:
+        items:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            user_id:
+              type: integer
+          type: object
+        type: array
+    type: object
 info:
   contact: {}
   description: API for storage-api-gateway
-  title: storage-master API
+  title: Storage-Master API
   version: "1.0"
 paths:
-  /api/v1/boxes:
+  /boxes:
     post:
       consumes:
       - application/json
@@ -58,7 +72,7 @@ paths:
       summary: Create new box
       tags:
       - boxes
-  /api/v1/cells:
+  /cells:
     post:
       consumes:
       - application/json
@@ -85,7 +99,33 @@ paths:
       summary: Create new cell
       tags:
       - cells
-  /api/v1/storages:
+  /storages:
+    get:
+      consumes:
+      - application/json
+      description: Get all storage instances related to the given user_id
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.getStoragesOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "500":
+          description: Storage service failed
+          schema:
+            type: string
+      summary: Get storages by user_id
+      tags:
+      - storages
     post:
       consumes:
       - application/json

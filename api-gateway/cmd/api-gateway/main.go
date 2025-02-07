@@ -23,7 +23,7 @@ var (
 	storageServiceClient storagepb.StorageServiceClient
 )
 
-// @title storage-master API
+// @title Storage-Master API
 // @version 1.0
 // @description API for storage-api-gateway
 // @BasePath /api/v1
@@ -43,7 +43,7 @@ type createStorageOkResponse struct {
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
 // @Failure 500 {string} string "Storage service failed"
-// @Router /api/v1/storages [post]
+// @Router /storages [post]
 func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Creating request to storage-service
@@ -66,6 +66,47 @@ func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Endpoint to get storages by user_id
+type getStoragesOkResponse struct{
+	Storages []struct{
+		ID uint64		`json:"id"` 
+		Name string		`json:"name"`
+		UserID uint64	`json:"user_id"`
+	}
+}
+
+// @Summary Get storages by user_id
+// @Description Get all storage instances related to the given user_id
+// @Tags storages
+// @Accept json
+// @Produce json
+// @Success 201 {object} getStoragesOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 405 {string} string "Method is not supported"
+// @Failure 500 {string} string "Storage service failed"
+// @Router /storages [get]
+func GetStoragesHandler(w http.ResponseWriter, r *http.Request){
+
+	// Extract user_id from JWT
+	userID := 2
+
+	// Create request to storage service
+	getStoragesRequest := storagepb.GetStoragesRequest{
+		UserId: uint64(userID),
+	}
+
+	// Process response from storage-service
+	response, err := storageServiceClient.GetStorages(context.Background(), &getStoragesRequest)
+
+	if err != nil{
+		http.Error(w, "Error from storage service", http.StatusInternalServerError)
+	}
+
+	// Process HTTP response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
 // Endpoint to create new cell
 type createCellOkResponse struct {
 	ID        uint64 `json:"id"`
@@ -82,7 +123,7 @@ type createCellOkResponse struct {
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
 // @Failure 500 {string} string "Storage service failed"
-// @Router /api/v1/cells [post]
+// @Router /cells [post]
 func CreateCellHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Creating request to storage-service
@@ -120,7 +161,7 @@ type createBoxOkResponse struct {
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
 // @Failure 500 {string} string "Storage service failed"
-// @Router /api/v1/boxes [post]
+// @Router /boxes [post]
 func CreateBoxHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Creating request to storage-service
@@ -163,6 +204,8 @@ func main() {
 		switch r.Method{
 		case http.MethodPost:
 			CreateStorageHandler(w, r)
+		case http.MethodGet:
+			GetStoragesHandler(w, r)
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
@@ -189,7 +232,6 @@ func main() {
 	mux.HandleFunc("/api/v1/swagger/", httpSwagger.WrapHandler)
 
 	// Add middleware
-
 	finalHandler := middleware.ChainMiddleware(mux, middleware.CorsMiddleware, middleware.RateLimitMiddleware, middleware.LoggingMiddleware)
 
 	if err := http.ListenAndServe(cfg.HTTPServer.Host+":"+cfg.HTTPServer.Port, finalHandler); err != nil {

@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/boxes": {
+        "/boxes": {
             "post": {
                 "description": "Create new named box connected to cell",
                 "consumes": [
@@ -56,7 +56,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/cells": {
+        "/cells": {
             "post": {
                 "description": "Create new named cell connected to storage to store boxes",
                 "consumes": [
@@ -97,7 +97,46 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/storages": {
+        "/storages": {
+            "get": {
+                "description": "Get all storage instances related to the given user_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "storages"
+                ],
+                "summary": "Get storages by user_id",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.getStoragesOkResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": "Method is not supported",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Storage service failed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new named storage to store cells",
                 "consumes": [
@@ -178,6 +217,28 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "main.getStoragesOkResponse": {
+            "type": "object",
+            "properties": {
+                "storages": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "user_id": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }`
@@ -188,7 +249,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "storage-master API",
+	Title:            "Storage-Master API",
 	Description:      "API for storage-api-gateway",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
