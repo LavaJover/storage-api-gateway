@@ -190,7 +190,7 @@ func main() {
 
 	// Add middleware
 
-	finalHandler := middleware.ChainMiddleware(mux, middleware.CorsMiddleware, middleware.RateLimitMiddleware)
+	finalHandler := middleware.ChainMiddleware(mux, middleware.CorsMiddleware, middleware.RateLimitMiddleware, middleware.LoggingMiddleware)
 
 	if err := http.ListenAndServe(cfg.HTTPServer.Host+":"+cfg.HTTPServer.Port, finalHandler); err != nil {
 		log.Fatalf("failed to start HTTP server")
