@@ -1,0 +1,79 @@
+basePath: /api/v1
+definitions:
+  main.createCellOkResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      storage_id:
+        type: integer
+    type: object
+  main.createStorageOkResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: API for storage-api-gateway
+  title: storage-master API
+  version: "1.0"
+paths:
+  /api/v1/cells:
+    post:
+      consumes:
+      - application/json
+      description: Create new named cell to store boxes
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.createCellOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "500":
+          description: Storage service failed
+          schema:
+            type: string
+      summary: Create new cell
+      tags:
+      - cells
+  /api/v1/storages:
+    post:
+      consumes:
+      - application/json
+      description: Create new named storage to store cells
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.createStorageOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "500":
+          description: Storage service failed
+          schema:
+            type: string
+      summary: Create new storage
+      tags:
+      - storages
+swagger: "2.0"
