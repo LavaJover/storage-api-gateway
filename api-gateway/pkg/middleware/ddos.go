@@ -6,8 +6,10 @@ import(
 	"time"
 )
 
-var rateLimit = make(map[string]int)
-var mu sync.Mutex
+var (
+	rateLimit = make(map[string]int)
+	mu sync.Mutex
+)
 
 func rateLimitMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +20,7 @@ func rateLimitMiddleware(next http.Handler) http.Handler {
 		mu.Unlock()
 
 		if count > 10 {
-			http.Error(w, "Слишком много запросов, попробуйте позже", http.StatusTooManyRequests)
+			http.Error(w, "Too many requests", http.StatusTooManyRequests)
 			return
 		}
 
