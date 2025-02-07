@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/LavaJover/storage-api-gateway/internal/config"
+	"github.com/LavaJover/storage-api-gateway/pkg/middleware"
 	// models "github.com/LavaJover/storage-master/storage-service/pkg/models"
 	storagepb "github.com/LavaJover/storage-master/storage-service/proto/gen"
 	"google.golang.org/grpc"
@@ -44,23 +45,6 @@ type createStorageOkResponse struct {
 // @Failure 500 {string} string "Storage service failed"
 // @Router /api/v1/storages [post]
 func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
-
-	// Add basic headers to response
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	// Ensure request method is POST
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)
-		return
-	}
 
 	// Creating request to storage-service
 	var newStorage storagepb.CreateStorageRequest
@@ -100,22 +84,6 @@ type createCellOkResponse struct {
 // @Failure 500 {string} string "Storage service failed"
 // @Router /api/v1/cells [post]
 func CreateCellHandler(w http.ResponseWriter, r *http.Request) {
-	// Add basic headers to response
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	// Ensure request method is POST
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)
-		return
-	}
 
 	// Creating request to storage-service
 	var newCell storagepb.AddCellRequest
@@ -154,22 +122,6 @@ type createBoxOkResponse struct {
 // @Failure 500 {string} string "Storage service failed"
 // @Router /api/v1/boxes [post]
 func CreateBoxHandler(w http.ResponseWriter, r *http.Request) {
-	// Add basic headers to response
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	// Ensure request method is POST
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)
-		return
-	}
 
 	// Creating request to storage-service
 	var newBox storagepb.AddBoxRequest
@@ -211,6 +163,8 @@ func main() {
 		switch r.Method{
 		case http.MethodPost:
 			CreateStorageHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
 	})
 
@@ -218,6 +172,8 @@ func main() {
 		switch r.Method{
 		case http.MethodPost:
 			CreateCellHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
 	})
 
@@ -225,12 +181,18 @@ func main() {
 		switch r.Method{
 		case http.MethodPost:
 			CreateBoxHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
 	})
 
 	mux.HandleFunc("/api/v1/swagger/", httpSwagger.WrapHandler)
 
-	if err := http.ListenAndServe(cfg.HTTPServer.Host+":"+cfg.HTTPServer.Port, nil); err != nil {
+	// Add middleware
+
+	finalHandler := middleware.ChainMiddleware(mux, middleware.CorsMiddleware, middleware.RateLimitMiddleware)
+
+	if err := http.ListenAndServe(cfg.HTTPServer.Host+":"+cfg.HTTPServer.Port, finalHandler); err != nil {
 		log.Fatalf("failed to start HTTP server")
 	}
 

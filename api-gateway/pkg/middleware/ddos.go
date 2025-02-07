@@ -11,7 +11,7 @@ var (
 	mu sync.Mutex
 )
 
-func rateLimitMiddleware(next http.Handler) http.Handler {
+func RateLimitMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := r.RemoteAddr
 		mu.Lock()
