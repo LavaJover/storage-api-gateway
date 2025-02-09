@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/LavaJover/storage-api-gateway/internal/config"
 	"github.com/LavaJover/storage-api-gateway/pkg/middleware"
@@ -408,16 +409,55 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(loginResponse)
 }
 
+// Process JWT validation
+type validateJWTRequest struct{
+	AccessToken string `json:"access_token"`
+}
+
+type validateJWTOkResponse struct{
+	UserID uint64 `json:"user_id"`
+}
+
+// @Summary Validate JWT
+// @Description Validate JWT passed in HTTP POST request header by Bearer scheme
+// @Tags valid
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Токен авторизации"
+// @Success 201 {object} validateJWTOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Invalid token"
+// @Failure 500 {string} string "SSO service failed"
+// @Router /auth/valid [post]
 func ValidateAccessJWTHandler(w http.ResponseWriter, r *http.Request){
 
 	// Extract access-JWT from header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == ""{
+		http.Error(w, "JWT was not found", http.StatusBadRequest)
+		return
+	}
+	headerParts := strings.Split(authHeader, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer"{
+		http.Error(w, "Wrong authorization header format", http.StatusBadRequest)
+		return
+	}
+	token := headerParts[1]
 
 	// Make request to sso-microservice/validate-access-JWT
+	validateRequest := ssopb.ValidateTokenRequest{
+		AccessToken: token,
+	}
+	validateResponse, err := ssoServiceClient.ValidateToken(context.Background(), &validateRequest)
 
 	// Process response from sso-microservice
+	if err != nil{
+		http.Error(w, "token is invalid", http.StatusUnauthorized)
+	}
 
 	// Send appropriate HTTP response
-
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(validateResponse)
 }
 
 func RefreshJWTHandler(w http.ResponseWriter, r *http.Request){

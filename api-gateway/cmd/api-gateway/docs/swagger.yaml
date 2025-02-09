@@ -90,6 +90,11 @@ definitions:
       password:
         type: string
     type: object
+  main.validateJWTOkResponse:
+    properties:
+      user_id:
+        type: integer
+    type: object
 info:
   contact: {}
   description: API for storage-api-gateway
@@ -168,6 +173,39 @@ paths:
       summary: Register new user
       tags:
       - signup
+  /auth/valid:
+    post:
+      consumes:
+      - application/json
+      description: Validate JWT passed in HTTP POST request header by Bearer scheme
+      parameters:
+      - description: Токен авторизации
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.validateJWTOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Invalid token
+          schema:
+            type: string
+        "500":
+          description: SSO service failed
+          schema:
+            type: string
+      summary: Validate JWT
+      tags:
+      - valid
   /boxes:
     get:
       consumes:
