@@ -311,12 +311,13 @@ func GetBoxesHandler(w http.ResponseWriter, r *http.Request){
 
 // --------------------------AUTH-API---------------------------------
 
+// Process user registration
 type registerRequest struct{
 	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
-type registerOkResponse struct{
+type authOkResponse struct{
 	AccessToken string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	UserID string `json:"user_id"`
@@ -328,7 +329,7 @@ type registerOkResponse struct{
 // @Accept json
 // @Produce json
 // @Param request body registerRequest true "User credentials"
-// @Success 201 {object} registerOkResponse
+// @Success 201 {object} authOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
 // @Failure 409 {string} string "Email is already taken"
@@ -362,16 +363,49 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(authResponse)
 }
 
+// Process user login
+type loginRequest struct{
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
+// @Summary Login user
+// @Description Login user using email and password
+// @Tags login
+// @Accept json
+// @Produce json
+// @Param request body loginRequest true "User credentials"
+// @Success 201 {object} authOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Wrong credentials"
+// @Failure 500 {string} string "SSO service failed"
+// @Router /auth/login [post]
 func LoginHandler(w http.ResponseWriter, r *http.Request){
 
 	// Extract credentials from HTTP POST request body
-
+	var loginRequest ssopb.LoginRequest
+	err := json.NewDecoder(r.Body).Decode(&loginRequest)
+	if err != nil{
+		http.Error(w, "failed to parse JSON", http.StatusBadRequest)
+		return
+	}
 	// Make request to sso-microservice/login rpc handler
+	loginResponse, err := ssoServiceClient.Login(context.Background(), &loginRequest)
 
 	// Process response from sso-microservice
+	if err != nil{
+		if errors.Is(err, ssoErrors.EmailNotFoundError{}){
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}else if errors.Is(err, ssoErrors.WrongPasswordError{}){
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+	}
 
 	// Send appropriate HTTP response
-
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(loginResponse)
 }
 
 func ValidateAccessJWTHandler(w http.ResponseWriter, r *http.Request){

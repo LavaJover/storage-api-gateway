@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  main.authOkResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        type: string
+    type: object
   main.createBoxOkResponse:
     properties:
       cell_id:
@@ -67,13 +76,11 @@ definitions:
           type: object
         type: array
     type: object
-  main.registerOkResponse:
+  main.loginRequest:
     properties:
-      access_token:
+      email:
         type: string
-      refresh_token:
-        type: string
-      user_id:
+      password:
         type: string
     type: object
   main.registerRequest:
@@ -89,6 +96,40 @@ info:
   title: Storage-Master API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user using email and password
+      parameters:
+      - description: User credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.authOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "500":
+          description: SSO service failed
+          schema:
+            type: string
+      summary: Login user
+      tags:
+      - login
   /auth/reg:
     post:
       consumes:
@@ -107,7 +148,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/main.registerOkResponse'
+            $ref: '#/definitions/main.authOkResponse'
         "400":
           description: Bad request
           schema:
