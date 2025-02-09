@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/LavaJover/storage-master/storage-service v0.0.0-20250207171338-8e2b369027ff
-	github.com/LavaJover/storage-sso-service/sso-service v0.0.0-20250209170633-19dd526c4912
+	github.com/LavaJover/storage-sso-service/sso-service v0.0.0-20250209180252-47c653eef261
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.4

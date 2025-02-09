@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"log/slog"
@@ -12,6 +13,7 @@ import (
 	"github.com/LavaJover/storage-api-gateway/internal/config"
 	"github.com/LavaJover/storage-api-gateway/pkg/middleware"
 	storagepb "github.com/LavaJover/storage-master/storage-service/proto/gen"
+	ssoErrors "github.com/LavaJover/storage-sso-service/sso-service/pkg/errors"
 	ssopb "github.com/LavaJover/storage-sso-service/sso-service/proto/gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -309,11 +311,84 @@ func GetBoxesHandler(w http.ResponseWriter, r *http.Request){
 
 // --------------------------AUTH-API---------------------------------
 
+type registerOkResponse struct{
+	AccessToken string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	UserID string `json:"user_id"`
+}
 
-
+// @Summary Register new user
+// @Description Register new user using email and password
+// @Tags signup
+// @Accept json
+// @Produce json
+// @Success 201 {object} registerOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 405 {string} string "Method is not supported"
+// @Failure 409 {string} string "Email is already taken"
+// @Failure 500 {string} string "SSO service failed"
+// @Router /auth/reg [post]
 func RegisterHandler(w http.ResponseWriter, r *http.Request){
 
+	// Extract credentials from HTTP POST request body
+	var registerRequest ssopb.RegisterRequest
+	err := json.NewDecoder(r.Body).Decode(&registerRequest)
+	if err != nil{
+		http.Error(w, "Failed to parse json", http.StatusBadRequest)
+		return
+	}
 
+	// Make request to sso-microservice/register rpc handler
+	authResponse, err := ssoServiceClient.Register(context.Background(), &registerRequest)
+
+	// Process response from sso-microservice
+	if err != nil{
+		if errors.Is(err, ssoErrors.EmailAlreadyTakenError{}){
+			http.Error(w, err.Error(), http.StatusConflict)
+			return 
+		}
+		http.Error(w, "SSO service error", http.StatusInternalServerError)
+		return
+	}
+
+	// Send appropriate HTTP response 
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(authResponse)
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request){
+
+	// Extract credentials from HTTP POST request body
+
+	// Make request to sso-microservice/login rpc handler
+
+	// Process response from sso-microservice
+
+	// Send appropriate HTTP response
+
+}
+
+func ValidateAccessJWTHandler(w http.ResponseWriter, r *http.Request){
+
+	// Extract access-JWT from header
+
+	// Make request to sso-microservice/validate-access-JWT
+
+	// Process response from sso-microservice
+
+	// Send appropriate HTTP response
+
+}
+
+func RefreshJWTHandler(w http.ResponseWriter, r *http.Request){
+
+	// Extract refresh-JWT from header
+
+	// Make request to sso-microservice/validate-refresh-JWT
+
+	// Process response from sso-microservice
+
+	// Send appropriate HTTP response
 
 }
 
@@ -323,14 +398,18 @@ func main() {
 	fmt.Println(cfg)
 
 	// Connect to sso-service
-	// ssoServiceClient, err := grpc.Dial(":"+)
+	ssoServiceConn, err := grpc.Dial(":"+cfg.GRPCSSOService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("failed to connect sso service: %v", err)
+	}
+	defer ssoServiceConn.Close()
+	ssoServiceClient = ssopb.NewAuthServiceClient(ssoServiceConn)
 
 	// Connect to storage-service
 	storageServiceConn, err := grpc.Dial(":"+cfg.GRPCStorageService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect storage service: %v", err)
 	}
-
 	defer storageServiceConn.Close()
 	storageServiceClient = storagepb.NewStorageServiceClient(storageServiceConn)
 
@@ -378,6 +457,34 @@ func main() {
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+
+	mux.HandleFunc("/api/v1/auth/login", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			LoginHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/api/v1/auth/valid", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			ValidateAccessJWTHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/api/v1/auth/refresh", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			RefreshJWTHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
 
 	mux.HandleFunc("/api/v1/swagger/", httpSwagger.WrapHandler)
 

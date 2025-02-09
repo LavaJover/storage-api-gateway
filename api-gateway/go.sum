@@ -7,6 +7,8 @@ github.com/LavaJover/storage-master/storage-service v0.0.0-20250207171338-8e2b36
 github.com/LavaJover/storage-master/storage-service v0.0.0-20250207171338-8e2b369027ff/go.mod h1:ZahR88hGdhwgrJtbxAAafFkM918uyPilwINqfp5j3jE=
 github.com/LavaJover/storage-sso-service/sso-service v0.0.0-20250209170633-19dd526c4912 h1:bdT5Cf7aEiD96Zhi/R5lptHUSoQzpt+bIYMXHjZSo2c=
 github.com/LavaJover/storage-sso-service/sso-service v0.0.0-20250209170633-19dd526c4912/go.mod h1:OzpR7K7v75hhIJtybjDhGie0Etm1bjUnBDMoUKdzjUk=
+github.com/LavaJover/storage-sso-service/sso-service v0.0.0-20250209180252-47c653eef261 h1:mQPRCLplSxC7rwsiwJ3VlpnNwZrfbz9qOzUpcHVrvsQ=
+github.com/LavaJover/storage-sso-service/sso-service v0.0.0-20250209180252-47c653eef261/go.mod h1:OzpR7K7v75hhIJtybjDhGie0Etm1bjUnBDMoUKdzjUk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=
