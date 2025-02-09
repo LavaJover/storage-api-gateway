@@ -5,3 +5,6 @@ http_server:
 grpc_storage_service:
   host: "localhost"
   port: "50051"
+grpc_sso_service:
+  host: "localhost"
+  port: "50052"

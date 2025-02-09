@@ -11,6 +11,7 @@ type APIConfig struct{
 	Env string 			`yaml:"env"`
 	HTTPServer 			`yaml:"http_server"`
 	GRPCStorageService 	`yaml:"grpc_storage_service"`
+	GRPCSSOService		`yaml:"grpc_sso_service"`
 }
 
 type HTTPServer struct{
@@ -21,6 +22,11 @@ type HTTPServer struct{
 type GRPCStorageService struct{
 	Host string `yaml:"host"`
 	Port string `yaml:"port"`
+}
+
+type GRPCSSOService struct{
+	Host string `yaml:"host" env-required:"true"`
+	Port string `yaml:"port" env-required:"true"`
 }
 
 func MustLoad() *APIConfig{
