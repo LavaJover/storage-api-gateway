@@ -410,10 +410,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 }
 
 // Process JWT validation
-type validateJWTRequest struct{
-	AccessToken string `json:"access_token"`
-}
-
 type validateJWTOkResponse struct{
 	UserID uint64 `json:"user_id"`
 }
@@ -423,7 +419,7 @@ type validateJWTOkResponse struct{
 // @Tags valid
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Токен авторизации"
+// @Param Authorization header string true "Access-JWT"
 // @Success 201 {object} validateJWTOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Invalid token"
@@ -460,16 +456,49 @@ func ValidateAccessJWTHandler(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(validateResponse)
 }
 
+// Process JWT refreshing
+
+// @Summary Refresh access-JWT
+// @Description Refresh access-JWT using refresh-JWT
+// @Tags refresh
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Refresh-JWT"
+// @Success 201 {object} authOkResponse
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Invalid token"
+// @Failure 500 {string} string "SSO service failed"
+// @Router /auth/refresh [post]
 func RefreshJWTHandler(w http.ResponseWriter, r *http.Request){
 
-	// Extract refresh-JWT from header
+	// Extract access-JWT from header
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == ""{
+		http.Error(w, "JWT was not found", http.StatusBadRequest)
+		return
+	}
+	headerParts := strings.Split(authHeader, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer"{
+		http.Error(w, "Wrong authorization header format", http.StatusBadRequest)
+		return
+	}
+	token := headerParts[1]
 
 	// Make request to sso-microservice/validate-refresh-JWT
+	refreshRequest := ssopb.RefreshTokenRequest{
+		RefreshToken: token,
+	}
+	refreshResponse, err := ssoServiceClient.RefreshToken(context.Background(), &refreshRequest)
 
 	// Process response from sso-microservice
+	if err != nil{
+		http.Error(w, "failed to refresh token", http.StatusUnauthorized)
+		return
+	}
 
 	// Send appropriate HTTP response
-
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(refreshResponse)
 }
 
 func main() {

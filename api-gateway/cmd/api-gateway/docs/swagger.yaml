@@ -135,6 +135,39 @@ paths:
       summary: Login user
       tags:
       - login
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access-JWT using refresh-JWT
+      parameters:
+      - description: Refresh-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.authOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Invalid token
+          schema:
+            type: string
+        "500":
+          description: SSO service failed
+          schema:
+            type: string
+      summary: Refresh access-JWT
+      tags:
+      - refresh
   /auth/reg:
     post:
       consumes:
@@ -179,7 +212,7 @@ paths:
       - application/json
       description: Validate JWT passed in HTTP POST request header by Bearer scheme
       parameters:
-      - description: Токен авторизации
+      - description: Access-JWT
         in: header
         name: Authorization
         required: true
