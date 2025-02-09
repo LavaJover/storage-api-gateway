@@ -67,12 +67,66 @@ definitions:
           type: object
         type: array
     type: object
+  main.registerOkResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        type: string
+    type: object
+  main.registerRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
 info:
   contact: {}
   description: API for storage-api-gateway
   title: Storage-Master API
   version: "1.0"
 paths:
+  /auth/reg:
+    post:
+      consumes:
+      - application/json
+      description: Register new user using email and password
+      parameters:
+      - description: User credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.registerOkResponse'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "405":
+          description: Method is not supported
+          schema:
+            type: string
+        "409":
+          description: Email is already taken
+          schema:
+            type: string
+        "500":
+          description: SSO service failed
+          schema:
+            type: string
+      summary: Register new user
+      tags:
+      - signup
   /boxes:
     get:
       consumes:

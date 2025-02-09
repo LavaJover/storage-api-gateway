@@ -311,6 +311,11 @@ func GetBoxesHandler(w http.ResponseWriter, r *http.Request){
 
 // --------------------------AUTH-API---------------------------------
 
+type registerRequest struct{
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
 type registerOkResponse struct{
 	AccessToken string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -322,6 +327,7 @@ type registerOkResponse struct{
 // @Tags signup
 // @Accept json
 // @Produce json
+// @Param request body registerRequest true "User credentials"
 // @Success 201 {object} registerOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
