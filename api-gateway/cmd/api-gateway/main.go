@@ -11,9 +11,8 @@ import (
 
 	"github.com/LavaJover/storage-api-gateway/internal/config"
 	"github.com/LavaJover/storage-api-gateway/pkg/middleware"
-
-	// models "github.com/LavaJover/storage-master/storage-service/pkg/models"
 	storagepb "github.com/LavaJover/storage-master/storage-service/proto/gen"
+	ssopb "github.com/LavaJover/storage-sso-service/sso-service/proto/gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -23,6 +22,7 @@ import (
 
 var (
 	storageServiceClient storagepb.StorageServiceClient
+	ssoServiceClient ssopb.AuthServiceClient
 )
 
 // @title Storage-Master API
@@ -305,10 +305,25 @@ func GetBoxesHandler(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(response)
 }
 
+
+
+// --------------------------AUTH-API---------------------------------
+
+
+
+func RegisterHandler(w http.ResponseWriter, r *http.Request){
+
+
+
+}
+
 func main() {
 
 	cfg := config.MustLoad()
 	fmt.Println(cfg)
+
+	// Connect to sso-service
+	// ssoServiceClient, err := grpc.Dial(":"+)
 
 	// Connect to storage-service
 	storageServiceConn, err := grpc.Dial(":"+cfg.GRPCStorageService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -350,6 +365,15 @@ func main() {
 			CreateBoxHandler(w, r)
 		case http.MethodGet:
 			GetBoxesHandler(w, r)
+		default:
+			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/api/v1/auth/reg", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method{
+		case http.MethodPost:
+			RegisterHandler(w, r)
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
