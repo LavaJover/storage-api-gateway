@@ -98,7 +98,7 @@ func GetStoragesHandler(w http.ResponseWriter, r *http.Request){
 	// Extract user_id from JWT
 	// ...
 	// Check if user have enough permissions to request this
-	userID := 2
+	userID, _ := strconv.ParseUint(r.Header.Get("user_id"), 10, 64)
 
 	// Create request to storage service
 	getStoragesRequest := storagepb.GetStoragesRequest{
@@ -525,7 +525,7 @@ func main() {
 	// Handle endpoints
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/v1/storages", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/api/v1/storages", middleware.AuthMiddleware(ssoServiceClient, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method{
 		case http.MethodPost:
 			CreateStorageHandler(w, r)
@@ -534,7 +534,7 @@ func main() {
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
-	})
+	})))
 
 	mux.HandleFunc("/api/v1/cells", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method{
