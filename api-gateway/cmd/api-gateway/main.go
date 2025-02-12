@@ -542,7 +542,7 @@ func main() {
 		}
 	})))
 
-	mux.HandleFunc("/api/v1/cells", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/api/v1/cells", middleware.AuthMiddleware(ssoServiceClient, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method{
 		case http.MethodPost:
 			CreateCellHandler(w, r)
@@ -551,9 +551,9 @@ func main() {
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
-	})
+	})))
 
-	mux.HandleFunc("/api/v1/boxes", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/api/v1/boxes", middleware.AuthMiddleware(ssoServiceClient, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method{
 		case http.MethodPost:
 			CreateBoxHandler(w, r)
@@ -562,7 +562,7 @@ func main() {
 		default:
 			http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 		}
-	})
+	})))
 
 	mux.HandleFunc("/api/v1/auth/reg", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method{
