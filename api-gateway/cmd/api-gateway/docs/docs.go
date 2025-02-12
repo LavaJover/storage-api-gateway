@@ -240,6 +240,13 @@ const docTemplate = `{
                 "summary": "Get boxes by cell_id",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Access-JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Cell ID",
                         "name": "cell_id",
@@ -292,6 +299,15 @@ const docTemplate = `{
                     "boxes"
                 ],
                 "summary": "Create new box",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access-JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -334,6 +350,13 @@ const docTemplate = `{
                 ],
                 "summary": "Get cells by storage_id",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access-JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Storage ID",
@@ -387,6 +410,15 @@ const docTemplate = `{
                     "cells"
                 ],
                 "summary": "Create new cell",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access-JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -428,6 +460,15 @@ const docTemplate = `{
                     "storages"
                 ],
                 "summary": "Get storages by user_id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access-JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -473,6 +514,15 @@ const docTemplate = `{
                     "storages"
                 ],
                 "summary": "Create new storage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access-JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",

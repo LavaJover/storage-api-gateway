@@ -245,6 +245,11 @@ paths:
       - application/json
       description: Get all boxes related to given cell_id checking user permissions
       parameters:
+      - description: Access-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Cell ID
         in: query
         name: cell_id
@@ -280,6 +285,12 @@ paths:
       consumes:
       - application/json
       description: Create new named box connected to cell
+      parameters:
+      - description: Access-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -308,6 +319,11 @@ paths:
       - application/json
       description: Get all cells by given storage_id with permission checking
       parameters:
+      - description: Access-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Storage ID
         in: query
         name: storage_id
@@ -343,6 +359,12 @@ paths:
       consumes:
       - application/json
       description: Create new named cell connected to storage to store boxes
+      parameters:
+      - description: Access-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -370,6 +392,12 @@ paths:
       consumes:
       - application/json
       description: Get all storage instances related to the given user_id
+      parameters:
+      - description: Access-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -400,6 +428,12 @@ paths:
       consumes:
       - application/json
       description: Create new named storage to store cells
+      parameters:
+      - description: Access-JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:

@@ -44,6 +44,7 @@ type createStorageOkResponse struct {
 // @Tags storages
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Access-JWT"
 // @Success 201 {object} createStorageOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
@@ -87,6 +88,7 @@ type getStoragesOkResponse struct{
 // @Tags storages
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Access-JWT"
 // @Success 201 {object} getStoragesOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 403 {string} string "You dont't have enough permissions"
@@ -130,6 +132,7 @@ type createCellOkResponse struct {
 // @Tags cells
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Access-JWT"
 // @Success 201 {object} createCellOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
@@ -172,6 +175,7 @@ type getCellsOkResponse struct{
 // @Tags cells
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Access-JWT"
 // @Param storage_id query uint true "Storage ID"
 // @Success 201 {object} getCellsOkResponse
 // @Failure 400 {string} string "Bad request"
@@ -227,6 +231,7 @@ type createBoxOkResponse struct {
 // @Tags boxes
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Access-JWT"
 // @Success 201 {object} createBoxOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
@@ -267,6 +272,7 @@ type getBoxesOkResponse struct{
 // @Tags boxes
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Access-JWT"
 // @Param cell_id query uint true "Cell ID"
 // @Success 201 {object} getBoxesOkResponse
 // @Failure 400 {string} string "Bad request"
