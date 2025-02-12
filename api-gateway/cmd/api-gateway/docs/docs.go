@@ -306,6 +306,15 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "description": "Box description",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.createBoxRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -417,6 +426,15 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "description": "Cell description",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.createCellRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -521,6 +539,15 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "description": "Storage description",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.createStorageRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -581,6 +608,17 @@ const docTemplate = `{
                 }
             }
         },
+        "main.createBoxRequest": {
+            "type": "object",
+            "properties": {
+                "cell_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "main.createCellOkResponse": {
             "type": "object",
             "properties": {
@@ -595,12 +633,31 @@ const docTemplate = `{
                 }
             }
         },
+        "main.createCellRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "storage_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "main.createStorageOkResponse": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.createStorageRequest": {
+            "type": "object",
+            "properties": {
                 "name": {
                     "type": "string"
                 }

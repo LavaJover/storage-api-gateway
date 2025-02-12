@@ -34,6 +34,10 @@ var (
 // @BasePath /api/v1
 
 // Endpoint to create new storage
+type createStorageRequest struct{
+	Name string `json:"name"`
+}
+
 type createStorageOkResponse struct {
 	ID   uint64 `json:"id"`
 	Name string `json:"name"`
@@ -45,12 +49,16 @@ type createStorageOkResponse struct {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Access-JWT"
+// @Param request body createStorageRequest true "Storage description"
 // @Success 201 {object} createStorageOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
 // @Failure 500 {string} string "Storage service failed"
 // @Router /storages [post]
 func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Extracting userID from request header
+	userID, _ := strconv.ParseUint(r.Header.Get("user_id"), 10, 64)
 
 	// Creating request to storage-service
 	var newStorage storagepb.CreateStorageRequest
@@ -59,6 +67,7 @@ func CreateStorageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to parse JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+	newStorage.UserId = userID
 
 	// Process response from storage-service
 	response, err := storageServiceClient.CreateStorage(context.Background(), &newStorage)
@@ -121,6 +130,11 @@ func GetStoragesHandler(w http.ResponseWriter, r *http.Request){
 }
 
 // Endpoint to create new cell
+type createCellRequest struct{
+	Name string `json:"name"`
+	StorageID uint64 `json:"storage_id"`
+}
+
 type createCellOkResponse struct {
 	ID        uint64 `json:"id"`
 	Name      string `json:"name"`
@@ -133,6 +147,7 @@ type createCellOkResponse struct {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Access-JWT"
+// @Param request body createCellRequest true "Cell description"
 // @Success 201 {object} createCellOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"
@@ -220,6 +235,11 @@ func GetCellsHandler(w http.ResponseWriter, r *http.Request){
 }
 
 // Endpoint to create new box
+type createBoxRequest struct{
+	Name string `json:"name"`
+	CellID uint64 `json:"cell_id"`
+}
+
 type createBoxOkResponse struct {
 	ID     uint64 `json:"id"`
 	Name   string `json:"name"`
@@ -232,6 +252,7 @@ type createBoxOkResponse struct {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Access-JWT"
+// @Param request body createBoxRequest true "Box description"
 // @Success 201 {object} createBoxOkResponse
 // @Failure 400 {string} string "Bad request"
 // @Failure 405 {string} string "Method is not supported"

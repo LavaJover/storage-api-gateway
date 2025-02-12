@@ -18,6 +18,13 @@ definitions:
       name:
         type: string
     type: object
+  main.createBoxRequest:
+    properties:
+      cell_id:
+        type: integer
+      name:
+        type: string
+    type: object
   main.createCellOkResponse:
     properties:
       id:
@@ -27,10 +34,22 @@ definitions:
       storage_id:
         type: integer
     type: object
+  main.createCellRequest:
+    properties:
+      name:
+        type: string
+      storage_id:
+        type: integer
+    type: object
   main.createStorageOkResponse:
     properties:
       id:
         type: integer
+      name:
+        type: string
+    type: object
+  main.createStorageRequest:
+    properties:
       name:
         type: string
     type: object
@@ -291,6 +310,12 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: Box description
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.createBoxRequest'
       produces:
       - application/json
       responses:
@@ -365,6 +390,12 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: Cell description
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.createCellRequest'
       produces:
       - application/json
       responses:
@@ -434,6 +465,12 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: Storage description
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.createStorageRequest'
       produces:
       - application/json
       responses:
